@@ -1,36 +1,25 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Weather App 🌦️
 
-## Getting Started
+A simple weather application built with **Next.js** and **OpenWeatherMap API**. It allows users to search for the weather in specific locations and displays real-time weather information such as temperature, humidity, and weather conditions. The app also features dynamic background animations for different weather types (e.g., sunny, cloudy, rainy).
 
-First, run the development server:
+## Features ✨
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- 🌞 **Dynamic background animations** for sunny, cloudy, rainy, snowy, and night-time weather.
+- 🌍 **Search for any city** to get live weather information.
+- 🔄 Real-time weather data powered by the [OpenWeatherMap API](https://openweathermap.org/).
+- 🎨 Built with **Tailwind CSS** for a fully responsive design.
+- ☀️ **Sunshine and clouds animation** to visually represent weather conditions.
+- 🔄 **Clear button** to reset and check another location.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Demo
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+A live demo of the project can be found [here](https://weather.ruhanpacolli.online) (optional).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Getting Started 🚀
 
-## Learn More
+Follow these instructions to get a copy of the project running locally.
 
-To learn more about Next.js, take a look at the following resources:
+### Prerequisites
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Node.js (v14 or later)
+- npm or yarn
