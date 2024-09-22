@@ -1,101 +1,98 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState } from 'react';
+import { motion } from 'framer-motion'; // For animations
+
+const WeatherApp = () => {
+  const [city, setCity] = useState('');
+  const [weather, setWeather] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchWeather = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setWeather(null); // Reset previous results
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=youre_key&units=metric`
+      );
+      
+      if (!response.ok) {
+        throw new Error('City not found');
+      }
+
+      const data = await response.json();
+      setWeather(data);
+    } catch (err: any) {
+      setError(err.message);
+      setWeather(null);
+    }
+  };
+
+  // Helper function to determine weather animation
+  const getWeatherAnimationClass = () => {
+    if (!weather) return '';
+
+    const weatherId = weather.weather[0].id; // Weather condition ID
+    const isNight = weather.dt > weather.sys.sunset || weather.dt < weather.sys.sunrise;
+
+    if (weatherId >= 200 && weatherId < 600) {
+      return 'rain-animation'; // Rain animation
+    } else if (weatherId >= 600 && weatherId < 700) {
+      return 'snow-animation'; // Snow animation
+    } else if (weatherId >= 700 && weatherId < 800) {
+      return 'wind-animation'; // Wind animation
+    } else if (weatherId === 800) {
+      return isNight ? 'night-animation' : 'sun-animation'; // Night or Sun animation
+    } else if (weatherId > 800) {
+      return 'cloud-animation'; // Cloudy animation
+    }
+    return '';
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+    <div className={`flex flex-col items-center justify-center min-h-screen text-gray-800 ${getWeatherAnimationClass()}`}>
+      <h1 className="text-4xl font-bold mb-4">Weather App</h1>
+      <form onSubmit={fetchWeather} className="flex flex-col items-center">
+        <input
+          type="text"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="Enter city name"
+          className="mb-4 p-2 text-lg border-2 border-gray-300 rounded-lg shadow-lg focus:outline-none"
         />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+        <button
+          type="submit"
+          className="px-6 py-2 bg-blue-500 text-white text-lg rounded-lg shadow hover:bg-blue-600 transition"
+        >
+          Get Weather
+        </button>
+      </form>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      {error && <p className="text-red-500 mt-4">{error}</p>}
+
+      {weather && (
+        <motion.div
+          className="relative mt-8 p-6 bg-white rounded-lg shadow-lg text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+          <h2 className="text-2xl font-semibold">
+            {weather.name}, {weather.sys.country}
+          </h2>
+          <p className="text-xl mt-2">{weather.weather[0].description}</p>
+          <p className="text-lg mt-1">Temperature: {weather.main.temp}°C</p>
+          <p className="text-lg mt-1">Humidity: {weather.main.humidity}%</p>
+          <img
+            className="mt-4 mx-auto"
+            src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
+            alt={weather.weather[0].description}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </motion.div>
+      )}
     </div>
   );
-}
+};
+
+export default WeatherApp;
