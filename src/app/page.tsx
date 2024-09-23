@@ -2,10 +2,32 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion'; // For animations
+import Image from 'next/image'; // Import next/image for optimized images
+import { Processor } from 'postcss';
+
+// Define type for the weather data from OpenWeather API
+type WeatherData = {
+  name: string;
+  sys: {
+    country: string;
+    sunrise: number;
+    sunset: number;
+  };
+  weather: Array<{
+    id: number;
+    description: string;
+    icon: string;
+  }>;
+  main: {
+    temp: number;
+    humidity: number;
+  };
+  dt: number;
+};
 
 const WeatherApp = () => {
   const [city, setCity] = useState('');
-  const [weather, setWeather] = useState<any>(null);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchWeather = async (e: React.FormEvent) => {
@@ -14,38 +36,39 @@ const WeatherApp = () => {
     setWeather(null); // Reset previous results
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=youre_key&units=metric`
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid={${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}}&units=metric`
       );
       
       if (!response.ok) {
         throw new Error('City not found');
       }
 
-      const data = await response.json();
+      const data: WeatherData = await response.json();
       setWeather(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      }
       setWeather(null);
     }
   };
 
-  // Helper function to determine weather animation
   const getWeatherAnimationClass = () => {
     if (!weather) return '';
 
-    const weatherId = weather.weather[0].id; // Weather condition ID
+    const weatherId = weather.weather[0].id;
     const isNight = weather.dt > weather.sys.sunset || weather.dt < weather.sys.sunrise;
 
     if (weatherId >= 200 && weatherId < 600) {
-      return 'rain-animation'; // Rain animation
+      return 'rain-animation';
     } else if (weatherId >= 600 && weatherId < 700) {
-      return 'snow-animation'; // Snow animation
+      return 'snow-animation';
     } else if (weatherId >= 700 && weatherId < 800) {
-      return 'wind-animation'; // Wind animation
+      return 'wind-animation';
     } else if (weatherId === 800) {
-      return isNight ? 'night-animation' : 'sun-animation'; // Night or Sun animation
+      return isNight ? 'night-animation' : 'sun-animation';
     } else if (weatherId > 800) {
-      return 'cloud-animation'; // Cloudy animation
+      return 'cloud-animation';
     }
     return '';
   };
@@ -84,10 +107,14 @@ const WeatherApp = () => {
           <p className="text-xl mt-2">{weather.weather[0].description}</p>
           <p className="text-lg mt-1">Temperature: {weather.main.temp}°C</p>
           <p className="text-lg mt-1">Humidity: {weather.main.humidity}%</p>
-          <img
+
+          {/* Optimized image using next/image */}
+          <Image
             className="mt-4 mx-auto"
             src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
             alt={weather.weather[0].description}
+            width={100}
+            height={100}
           />
         </motion.div>
       )}
