@@ -36,7 +36,7 @@ const WeatherApp = () => {
     setWeather(null); // Reset previous results
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=b82a2603f7c8e1d310b84dfa7e0f7d03&units=metric`
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=youre_api_Key&units=metric`
       );
       
       if (!response.ok) {
